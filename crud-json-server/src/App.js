@@ -1,68 +1,199 @@
-import React, { Component } from "react";
+import React,{Component} from "react";
 import Lists from "./Lists";
+import CreateList from "./CreateList";
 
-class App extends Component {
+class App extends Component{
 
-  constructor(){
-    super();
+constructor(){
 
-    this.state = {
-      loading:true,
-      alldata:[]
-    }
-  }
+super();
 
-  getLists = () => {
+this.state={
 
-    fetch("http://localhost:5000/posts")
-    .then(res=>res.json())
-    .then(result => {
+loading:true,
+alldata:[],
+singledata:{
+title:"",
+author:""
+}
 
-      this.setState({
-        loading:false,
-        alldata:result
-      });
+}
 
-    })
-    .catch(console.log);
+}
 
-  }
+getLists=()=>{
 
-  render(){
+fetch("http://localhost:5000/posts")
+.then(res=>res.json())
+.then(result=>{
 
-    let loading;
+this.setState({
 
-    if(this.state.loading){
-      loading = <p>Loading Data .... Please be patient</p>
-    }
-    else{
-      loading = <Lists alldata={this.state.alldata}/>
-    }
+loading:false,
+alldata:result
 
-    return(
+});
 
-      <div className="container">
+})
 
-        <span className="title-bar">
+}
 
-          <button
-          type="button"
-          className="btn btn-primary"
-          onClick={this.getLists}
-          >
+handleChange=(event)=>{
 
-          Get Lists
+let title=this.state.singledata.title;
+let author=this.state.singledata.author;
 
-          </button>
+if(event.target.name==="title")
+title=event.target.value;
 
-        </span>
+else
+author=event.target.value;
 
-        {loading}
+this.setState({
 
-      </div>
+singledata:{
+title:title,
+author:author
+}
 
-    );
-  }
+});
+
+}
+
+createList=()=>{
+
+fetch("http://localhost:5000/posts",{
+
+method:"POST",
+
+headers:{
+"Content-Type":"application/json"
+},
+
+body:JSON.stringify(this.state.singledata)
+
+})
+
+.then(()=>{
+
+this.setState({
+
+singledata:{
+title:"",
+author:""
+}
+
+});
+
+this.getLists();
+
+});
+
+}
+
+getList=(event,id)=>{
+
+this.setState({
+
+singledata:{
+title:"Loading...",
+author:"Loading..."
+}
+
+});
+
+fetch("http://localhost:5000/posts/"+id)
+
+.then(res=>res.json())
+
+.then(result=>{
+
+this.setState({
+
+singledata:{
+title:result.title,
+author:result.author
+}
+
+});
+
+});
+
+}
+
+updateList=(event,id)=>{
+
+fetch("http://localhost:5000/posts/"+id,{
+
+method:"PUT",
+
+headers:{
+"Content-Type":"application/json"
+},
+
+body:JSON.stringify(this.state.singledata)
+
+})
+
+.then(()=>{
+
+this.getLists();
+
+});
+
+}
+
+deleteList=(event,id)=>{
+
+fetch("http://localhost:5000/posts/"+id,{
+
+method:"DELETE"
+
+})
+
+.then(()=>{
+
+this.getLists();
+
+});
+
+}
+
+render(){
+
+return(
+
+<div className="container">
+
+<button
+className="btn btn-primary"
+onClick={this.getLists}
+>
+
+Get Lists
+
+</button>
+
+<CreateList
+singledata={this.state.singledata}
+handleChange={this.handleChange}
+createList={this.createList}
+/>
+
+<Lists
+alldata={this.state.alldata}
+singledata={this.state.singledata}
+getList={this.getList}
+updateList={this.updateList}
+deleteList={this.deleteList}
+handleChange={this.handleChange}
+/>
+
+</div>
+
+);
+
+}
 
 }
 
