@@ -1,6 +1,7 @@
 import React, { Component } from "react";
 import "bootstrap/dist/css/bootstrap.min.css";
 import Contacts from "./components/Contacts";
+import axios from "axios"; 
 
 class App extends Component {
   constructor() {
@@ -12,14 +13,21 @@ class App extends Component {
   }
 
   componentDidMount() {
-    fetch("http://jsonplaceholder.typicode.com/users")
-      .then((res) => res.json())
-      .then((result) => {
+    axios.get("http://jsonplaceholder.typicode.com/users")   
+      .then((response) => {
         this.setState({
-          contacts: result
+          contacts: response.data   
         });
       })
       .catch((error) => console.log(error));
+    // fetch("http://jsonplaceholder.typicode.com/users")
+    //   .then((res) => res.json())
+    //   .then((result) => {
+    //     this.setState({
+    //       contacts: result
+    //     });
+    //   })
+    //   .catch((error) => console.log(error));
   }
 
   render() {
